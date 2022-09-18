@@ -40,20 +40,26 @@ namespace NoProblem
             for (int key = 0; key < 50; ++key)
             {
                 Notification.Problem1 problem = ModInfo.ProblemTranslator[(Problem)key];
-                if (ModInfo.Options.ProblemOptions[key] && (problems2 & problem) != null)
-                    return (problems1 | problems2) & ~problem;
-            }
-            if ((problems2 & Notification.ProblemStruct.None) != null)
-                return (problems1 & Notification.ProblemStruct.None) != null ? problems1 | problems2 : problems2;
-            if ((problems2 & Notification.ProblemStruct.Major) != null)
-            {
-                if ((problems1 & Notification.ProblemStruct.None) != null)
-                    return problems1;
-                return (problems1 & Notification.ProblemStruct.Major) != null ? problems1 | problems2 : problems2;
+
+                if (ModInfo.Options.ProblemOptions[key] && (problem & problems2).IsNotNone)
+                {
+                    return Notification.ProblemStruct.None;
+                }
             }
 
-            // problems1 & -4611686018427387904L
-            return (problems1 & Notification.ProblemStruct.Major) != null ? problems1 : problems1 | problems2;
+            if ((problems2 & Notification.ProblemStruct.Fatal).IsNotNone)
+            {
+                return (problems1 & Notification.ProblemStruct.Fatal).IsNotNone ? problems1 | problems2 : problems2;
+            }
+
+            if ((problems2 & Notification.ProblemStruct.Major).IsNotNone)
+            {
+                if ((problems1 & Notification.ProblemStruct.Fatal).IsNotNone)
+                    return problems1;
+                return (problems1 & Notification.ProblemStruct.Major).IsNotNone ? problems1 | problems2 : problems2;
+            }
+
+            return (problems1 & Notification.ProblemStruct.MajorOrFatal).IsNotNone ? problems1 : problems1 | problems2;
         }
     }
 }
